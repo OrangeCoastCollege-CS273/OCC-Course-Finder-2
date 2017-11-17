@@ -5,6 +5,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ListView;
@@ -61,6 +62,8 @@ public class CourseSearchActivity extends AppCompatActivity {
 
         instructorSpinner.setAdapter(instructorSpinnerAdapter);
 
+        courseTitleEditText.addTextChangedListener(courseTitleTextWatcher);
+        instructorSpinner.setOnItemSelectedListener(instructorSpinnderListener);
 
 
     }
@@ -81,12 +84,13 @@ public class CourseSearchActivity extends AppCompatActivity {
     //TODO (3): Create a void method named reset that sets the test of the edit text back to an
     //TODO: empty string, sets the selection of the Spinner to 0 and clears out the offeringListAdapter,
     //TODO: then rebuild it with the allOfferingsList
-    private void reset(View view) {
+    protected View reset(View view) {
         courseTitleEditText.setText("");
         instructorSpinner.setSelection(0);
 
         offeringListAdapter.clear();
         offeringListAdapter.addAll(allOfferingsList);
+        return view;
     }
 
 
@@ -95,7 +99,7 @@ public class CourseSearchActivity extends AppCompatActivity {
     //TODO: Clear the offeringListAdapter
     //TODO: If the entry is an empty String "", the offeringListAdapter should addAll from the allOfferingsList
     //TODO: Else, the offeringListAdapter should add each Offering whose course title starts with the entry.
-    public TextWatcher courseTtitleTextWatcher = new TextWatcher() {
+    public TextWatcher courseTitleTextWatcher = new TextWatcher() {
         @Override
         public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
 
@@ -116,11 +120,34 @@ public class CourseSearchActivity extends AppCompatActivity {
         public void afterTextChanged(Editable editable) {
 
         }
-    }
+    };
 
 
     //TODO (5): Create an AdapterView.OnItemSelectedListener named instructorSpinnerListener and implement
     //TODO: the onItemSelected method to do the following:
     //TODO: If the selectedInstructorName != "[Select Instructor]", clear the offeringListAdapter,
     //TODO: then rebuild it with every Offering that has an instructor whose full name equals the one selected.
+    public AdapterView.OnItemSelectedListener instructorSpinnderListener = new AdapterView.OnItemSelectedListener() {
+        @Override
+        public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
+            String instructorName = String.valueOf(adapterView.getSelectedItem());
+
+            offeringListAdapter.clear();
+
+            if (instructorName.equals("[SELECT INSTRUCTOR]")) {
+                offeringListAdapter.addAll(allOfferingsList);
+            } else {
+                for (Offering offering : allOfferingsList) {
+                    if (instructorName.equals(offering.getInstructor().getFullName())) {
+                        offeringListAdapter.add(offering);
+                    }
+                }
+            }
+        }
+
+        @Override
+        public void onNothingSelected(AdapterView<?> adapterView) {
+
+        }
+    };
 }
